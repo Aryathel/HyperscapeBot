@@ -1,0 +1,65 @@
+from enum import Enum
+from aenum import MultiValueEnum
+
+class StatCategory(Enum):
+    main = "main"
+    solo = "solo"
+    squad = "squad"
+    general = "general"
+    best = "best"
+    weapons = "weapons"
+    hacks = "hacks"
+
+class WeaponStat(MultiValueEnum):
+    dragonfly = "dragonfly", "dfly"
+    mammoth = "mammoth", "shotty", "shotgun"
+    ripper = "ripper"
+    dtap = "dtap", "d-tap"
+    harpy = "harpy", "harpie"
+    komodo = "komodo"
+    hexfire = "hexfire", "hex"
+    riot = "riot"
+    salvo = "salvo"
+    skybreaker = "skybreaker"
+    protocol = "protocol", "sniper", "snipe"
+
+class HackStat(MultiValueEnum):
+    mine = "mine"
+    slam = "slam"
+    shockwave = "shockwave"
+    wall = "wall"
+    heal = "heal"
+    reveal = "reveal"
+    teleport = "teleport", "tp"
+    ball = "ball"
+    invis = "invis", "invisibility"
+    armor = "armor"
+    magnet = "magnet", "mag"
+
+class Stat(MultiValueEnum):
+    wins = "wins", "win", "w"
+    crown_wins = "crownwins", "crownwin", "crown_win", "crown_wins", "cw", "cws"
+    damage = "damage", "dmg"
+    assists = "assists", "assist", "ass"
+    matches = "matches", "match", "ma"
+    chests_broken = "chests_broken", "cb", "chestsbroken", "chest_broken", "chestbroken"
+    crown_pickups = "crown_pickups", "crownpickups", "crown_pickup", "crownpickup", "cp", "cps"
+    damage_done = "damage_done", "damagedone", "dmgdone", "dmgd"
+    kills = "kills", "kill", "k", "ks"
+    fusions = "fusions", "fusion", "f", "fs"
+    revives = "revives", "revive", "rv", "rvs"
+    time_played = "time_played", "timeplayed", "tmpd", "tmp"
+    weapon_headshot_damage = "weapon_headshot_damage", "weaponheadshotdamage", "wpnhdshtdmg", "hdshtdmg"
+    weapon_body_damage = "weapon_body_damage", "weaponbodydamage", "wpnbdydmg"
+    damage_by_items = "damage_by_items", "dmg_by_items", "damagebyitems", "itmdmdg", "itemdamage", "item_damage"
+    avg_kills_per_match = "avg_kills_per_match", "avg_kills", "avgkills"
+    avg_dmg_per_kill = "avg_dmg_per_kill", "avg_damage_per_kill", "avgdamageperkill", "avgdmgkill"
+    losses = "losses", "loss", "l", "ls"
+    winrate = "winrate", "wnr"
+    kd = "kd"
+    headshot_accuracy = "headshot_accuracy", "hdshtacc"
+
+class Platforms(Enum):
+    uplay = "pc"
+    xbl = "xbl"
+    psn = "psn"

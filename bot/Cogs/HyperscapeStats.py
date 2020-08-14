@@ -1,11 +1,11 @@
 import asyncio
-from enum import Enum
-from aenum import MultiValueEnum
 
 import aiohttp
 import discord
 from discord.ext import commands
 import datetime
+
+from Resources.Enums import StatCategory, WeaponStat, HackStat, Stat, Platforms
 
 """Cog | Hyperscape Stats
 
@@ -20,48 +20,15 @@ class HyperscapeStats(commands.Cog, name = "Hyperscape Stats"):
     """
     Commands relating to getting and viewing Hyperscape profile stats.
     """
-
-    class StatCategory(Enum):
-        main = "main"
-        solo = "solo"
-        squad = "squad"
-        general = "general"
-        best = "best"
-
-    class Stat(MultiValueEnum):
-        wins = "wins", "win", "w"
-        crown_wins = "crownwins", "crownwin", "crown_win", "crown_wins", "cw", "cws"
-        damage = "damage", "dmg"
-        assists = "assists", "assist", "ass"
-        matches = "matches", "match", "ma"
-        chests_broken = "chests_broken", "cb", "chestsbroken", "chest_broken", "chestbroken"
-        crown_pickups = "crown_pickups", "crownpickups", "crown_pickup", "crownpickup", "cp", "cps"
-        damage_done = "damage_done", "damagedone", "dmgdone", "dmgd"
-        kills = "kills", "kill", "k", "ks"
-        fusions = "fusions", "fusion", "f", "fs"
-        revives = "revives", "revive", "rv", "rvs"
-        time_played = "time_played", "timeplayed", "tmpd", "tmp"
-        weapon_headshot_damage = "weapon_headshot_damage", "weaponheadshotdamage", "wpnhdshtdmg", "hdshtdmg"
-        weapon_body_damage = "weapon_body_damage", "weaponbodydamage", "wpnbdydmg"
-        damage_by_items = "damage_by_items", "dmg_by_items", "damagebyitems", "itmdmdg", "itemdamage", "item_damage"
-        avg_kills_per_match = "avg_kills_per_match", "avg_kills", "avgkills"
-        avg_dmg_per_kill = "avg_dmg_per_kill", "avg_damage_per_kill", "avgdamageperkill", "avgdmgkill"
-        losses = "losses", "loss", "l", "ls"
-        winrate = "winrate", "wnr"
-        kd = "kd"
-        headshot_accuracy = "headshot_accuracy", "hdshtacc"
-
-    class Platforms(Enum):
-        uplay = "pc"
-        xbl = "xbl"
-        psn = "psn"
-
     def __init__(self, bot):
         self.bot = bot
         if not 'HyperscapeUsers' in self.bot.data.keys():
             self.bot.data['HyperscapeUsers'] = {"profiles":{}, "discords": {}}
             self.bot.data_manager.save_data()
         print(f"{self.bot.OK} {self.bot.TIMELOG()} Loaded Hyperscape Stats Cog.")
+
+    def cog_unload():
+        print(f"{self.bot.OK} {self.bot.TIMELOG()} Unloaded Hyperscape Stats Cog.")
 
     @commands.guild_only()
     @commands.group(name = "profile", aliases = ['p'], help = "Commands about player profiles.", invoke_without_command = True, case_insensitive = True)
@@ -101,8 +68,9 @@ class HyperscapeStats(commands.Cog, name = "Hyperscape Stats"):
 
             # Create a response showing basic user stats
             embed = self.bot.embed_util.get_embed(
-                author_url = f"https://tabstats.com/hyperscape/player/{profile.player_name.lower()}/{profile.player_id}",
+                author_url = profile.url,
                 title = f"{profile.player_name}'s Stats Profile",
+                thumbnail = profile.avatar_url,
                 desc = f"*For more information on specific stats, use `{self.bot.prefix}stats`*",
                 fields = [
                     {
@@ -163,7 +131,7 @@ class HyperscapeStats(commands.Cog, name = "Hyperscape Stats"):
             # If the user does not have a linked profile
             embed = self.bot.embed_util.get_embed(
                 title = "No Profile Registered",
-                desc = f"There are no stat profiles linked for {user.mention},\n but they can use `{self.bot.prefix}profile link` to get started."
+                desc = f"There are no stat profiles linked for {user.mention},\n but they can use `{self.bot.prefix}profile link Username` to get started."
             )
             await ctx.send(embed = embed)
 
@@ -184,7 +152,7 @@ class HyperscapeStats(commands.Cog, name = "Hyperscape Stats"):
         await ctx.trigger_typing()
         # Make sure platform is valid
         try:
-            platform = self.Platforms(platform).name
+            platform = Platforms(platform).name
         except:
             embed = self.bot.embed_util.get_embed(
                 title = "Invalid Platform",
@@ -269,7 +237,7 @@ class HyperscapeStats(commands.Cog, name = "Hyperscape Stats"):
         await ctx.trigger_typing()
         # Make sure platform is valid
         try:
-            platform = self.Platforms(platform).name
+            platform = Platforms(platform).name
         except:
             embed = self.bot.embed_util.get_embed(
                 title = "Invalid Platform",
@@ -370,12 +338,22 @@ class HyperscapeStats(commands.Cog, name = "Hyperscape Stats"):
                 fields = [
                     {
                         "name": "Stat Categorys",
-                        "value": "\n".join(f"`{i}`" for i in list(self.StatCategory.__dict__['_member_map_'])),
-                        "inline": False
+                        "value": "\n".join(f"`{i}`" for i in list(StatCategory.__dict__['_member_map_'])),
+                        "inline": True
+                    },
+                    {
+                        "name": "Weapon Stats",
+                        "value": f"`{self.bot.prefix}stat WeaponName`",
+                        "inline": True
+                    },
+                    {
+                        "name": "Hack Stats",
+                        "value": f"`{self.bot.prefix}stat HackName`",
+                        "inline": True
                     },
                     {
                         "name": "Individual Stats",
-                        "value": "\n".join(f"`{i}`" for i in list(self.Stat.__dict__['_member_map_'])),
+                        "value": "\n".join(f"`{i}`" for i in list(Stat.__dict__['_member_map_'])),
                         "inline": False
                     }
                 ]
@@ -385,9 +363,15 @@ class HyperscapeStats(commands.Cog, name = "Hyperscape Stats"):
             try:
                 # Try to find a category for the user input
                 try:
-                    category = self.StatCategory(category.lower())
+                    category = StatCategory(category.lower())
                 except:
-                    category = self.Stat(category.lower())
+                    try:
+                        category = Stat(category.lower())
+                    except:
+                        try:
+                            category = WeaponStat(category.lower())
+                        except:
+                            category = HackStat(category.lower())
             except:
                 # If the category does not exist, return an error
                 embed = self.bot.embed_util.get_embed(
@@ -396,13 +380,23 @@ class HyperscapeStats(commands.Cog, name = "Hyperscape Stats"):
                     fields = [
                         {
                             "name": "Stat Categorys",
-                            "value": "\n".join(f"`{i}`" for i in list(self.StatCategory.__dict__['_member_map_'])),
-                            "inline": False
+                            "value": "\n".join(f"`{i}`" for i in list(StatCategory.__dict__['_member_map_'])),
+                            "inline": True
                         },
                         {
                             "name": "Individual Stats",
-                            "value": "\n".join(f"`{i}`" for i in list(self.Stat.__dict__['_member_map_'])),
-                            "inline": False
+                            "value": "\n".join(f"`{i}`" for i in list(Stat.__dict__['_member_map_'])),
+                            "inline": True
+                        },
+                        {
+                            "name": "Weapon Stats",
+                            "value": f"{self.bot.prefix}stat WeaponName",
+                            "inline": True
+                        },
+                        {
+                            "name": "Hack Stats",
+                            "value": f"{self.bot.prefix}stat HackName",
+                            "inline": True
                         }
                     ]
                 )
@@ -431,18 +425,25 @@ class HyperscapeStats(commands.Cog, name = "Hyperscape Stats"):
                     profile = self.bot.data['HyperscapeUsers']['profiles'][prof_name]
 
                 # return stat results
-                if type(category) == self.StatCategory:
+                if type(category) == StatCategory:
                     embed = self.bot.embed_util.get_embed(
                         title = f"{category.name.capitalize()} Stats",
                         thumbnail = profile.avatar_url,
-                        fields = self.bot.data_manager.get_stat_category_fields(category.name, profile)
+                        fields = self.bot.data_manager.get_stat_category_fields(category.name, profile),
+                        author_url = profile.url
                     )
-                elif type(category) == self.Stat:
+                elif type(category) == Stat:
                     embed = self.bot.embed_util.get_embed(
                         title = f"{' '.join(i.capitalize() for i in category.name.split('_'))} Stat",
                         thumbnail = profile.avatar_url,
-                        desc = getattr(profile, category.name)
+                        desc = getattr(profile, category.name),
+                        author_url = profile.url
                     )
+                elif type(category) == WeaponStat:
+                    embed = self.bot.data_manager.get_weapon_stat_embed(category.name, profile)
+                elif type(category) == HackStat:
+                    embed = self.bot.data_manager.get_hack_stat_embed(category.name, profile)
+
                 embed.set_author(
                     name = user.name,
                     icon_url = user.avatar_url,
@@ -453,7 +454,7 @@ class HyperscapeStats(commands.Cog, name = "Hyperscape Stats"):
                 # If the user does not have a linked profile
                 embed = self.bot.embed_util.get_embed(
                     title = "No Profile Registered",
-                    desc = f"There are no stat profiles linked for {user.mention},\n but they can use `{self.bot.prefix}profile link` to get started."
+                    desc = f"There are no stat profiles linked for {user.mention},\n but they can use `{self.bot.prefix}profile link Username` to get started."
                 )
                 await ctx.send(embed = embed)
 

@@ -5,6 +5,26 @@ import json
 import aiohttp
 import requests
 
+class WeaponStat:
+    def __init__(self, options, name):
+        self.name = name
+
+        self.kills = options.get('kills')
+        self.damage = options.get('damage')
+        self.headshot_damage = options.get('headshot_damage')
+        self.fusions = options.get('fusions')
+        self.hs_accuracy = options.get('hs_accuracy')
+
+class HackStat:
+    def __init__(self, options, name):
+        self.name = name
+
+        self.kills = options.get('kills')
+        self.damage = options.get('damage')
+        self.headshot_damage = options.get('headshot_damage')
+        self.fusions = options.get('fusions')
+        self.hs_accuracy = options.get('headshot_accuracy')
+
 class Profile:
     def __init__(self, options):
         self.found = options.get('found', False)
@@ -78,6 +98,32 @@ class Profile:
             self.kd = stats.get('kd')
             self.headshot_accuracy = stats.get('headshot_accuracy')
 
+            weapons = options.get('data').get('weapons')
+            self.dragonfly = WeaponStat(weapons.get('Dragon Fly'), 'Dragon Fly')
+            self.mammoth = WeaponStat(weapons.get('Mammoth MK1'), 'Mammoth MK1')
+            self.ripper = WeaponStat(weapons.get('The Ripper'), 'The Ripper')
+            self.dtap = WeaponStat(weapons.get('D-Tap'), 'D-Tap')
+            self.harpy = WeaponStat(weapons.get('Harpy'), 'Harpy')
+            self.komodo = WeaponStat(weapons.get('Komodo'), 'Komodo')
+            self.hexfire = WeaponStat(weapons.get('Hexfire'), 'Hexfire')
+            self.riot = WeaponStat(weapons.get('Riot One'), 'Riot One')
+            self.salvo = WeaponStat(weapons.get('Salvo EPL'), 'Salvo EPL')
+            self.skybreaker = WeaponStat(weapons.get('Skybreaker'), 'Skybreaker')
+            self.protocol = WeaponStat(weapons.get('Protocol V'), 'Protocol V')
+
+            hacks = options.get('data').get('hacks')
+            self.mine = HackStat(hacks.get('Mine'), 'Mine')
+            self.slam = HackStat(hacks.get('Slam'), 'Slam')
+            self.shockwave = HackStat(hacks.get('Shockwave'), 'Shockwave')
+            self.wall = HackStat(hacks.get('Wall'), 'Wall')
+            self.heal = HackStat(hacks.get('Heal'), 'Heal')
+            self.reveal = HackStat(hacks.get('Reveal'), 'Reveal')
+            self.teleport = HackStat(hacks.get('Teleport'), 'Teleport')
+            self.ball = HackStat(hacks.get('Ball'), 'Ball')
+            self.invis = HackStat(hacks.get('Invisibility'), 'Invisibility')
+            self.armor = HackStat(hacks.get('Armor'), 'Armor')
+            self.magnet = HackStat(hacks.get('Magnet'), 'Magnet')
+
             self.avatar_url = f"https://ubisoft-avatars.akamaized.net/{self.player_id}/default_146_146.png"
             self.url = f"https://tabstats.com/hyperscape/player/{self.player_name.lower()}/{self.player_id}"
 
@@ -97,17 +143,14 @@ class APISession:
                 if profile.last_refresh < datetime.datetime.now() - datetime.timedelta(minutes = 10):
                     await self.update_player_by_id(session, id)
                     profile = await self.get_profile_by_id(session, id)
-                print(f"Loaded profile for {username}.")
                 return profile
             else:
-                print(f"Profile {username} could not be found.")
                 return None
 
     async def search_user_by_name(self, session, username, platform = "uplay"):
         async with session.get(f"https://hypers.apitab.com/search/{platform}/{username}") as r:
             if r.status == 200:
                 res = await r.json()
-                print(res)
                 if type(res['players']) == dict:
                     top_res = list(res['players'].keys())[0]
                 else:
@@ -122,7 +165,7 @@ class APISession:
 
     async def update_player_by_id(self, session, id):
         async with session.get(f"https://hypers.apitab.com/update/{id}?u=89031276") as r:
-            print(r.status)
+            pass
 
 if __name__ == "__main__":
     username = input("Input the username you would like to search: ")

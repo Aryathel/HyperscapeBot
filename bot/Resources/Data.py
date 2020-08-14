@@ -11,6 +11,17 @@ from colorama import Fore
 import datetime
 
 class DataManager:
+    """Class | Data Manager
+
+    This class is in charge of a variety of functions
+    pertaining to monotonous data management,
+    as well as loading and saving data to and from
+    the data storage file.
+
+    Args
+    ----------
+    bot - The discord.Client object of the bot connection.
+    """
     def __init__(self, bot):
         self.bot = bot
 
@@ -111,6 +122,18 @@ class DataManager:
             self.save_data()
 
     async def update_user_cache(self, name, platform = "uplay"):
+        """Function | Update User Stat Profile
+
+        This function is used to handle the updating of the given name's
+        stat data within the data cache. The data can only be updated every 10 minutes,
+        so this is how it is handled.
+
+        Args
+        ----------
+        name - The profile name to update
+        platform - The platform the user's profile is on, either `uplay`,
+            `xbl`, or `psn`.
+        """
         if name.lower() in self.bot.data['HyperscapeUsers']['profiles']:
             profile = self.bot.data['HyperscapeUsers']['profiles'][name.lower()]
             if datetime.datetime.now() - datetime.timedelta(minutes = 10) > profile.last_refresh:
@@ -129,6 +152,17 @@ class DataManager:
                 return False
 
     def get_stat_category_fields(self, name, profile):
+        """Function | Get Stat Category Embed Fields
+
+        This function returns a list of field elements to be used
+        in the created of embed responses when a user searches an entire stat
+        category instead of a singular stat.
+
+        Args
+        ----------
+        name - The name of the stat category being searched
+        profile - An instance of the Profile class found in './Resources/APISession.py'
+        """
         if name == "main":
             fields = [
                 {
@@ -364,5 +398,203 @@ class DataManager:
                     "inline": True
                 }
             ]
+        elif name == "weapons":
+            fields = [
+                {
+                    "name": f"{profile.dragonfly.name} Kills",
+                    "value": profile.dragonfly.kills,
+                    "inline": True
+                },
+                {
+                    "name": f"{profile.mammoth.name} Kills",
+                    "value": profile.mammoth.kills,
+                    "inline": True
+                },
+                {
+                    "name": f"{profile.ripper.name} Kills",
+                    "value": profile.ripper.kills,
+                    "inline": True
+                },
+                {
+                    "name": f"{profile.dtap.name} Kills",
+                    "value": profile.dtap.kills,
+                    "inline": True
+                },
+                {
+                    "name": f"{profile.harpy.name} Kills",
+                    "value": profile.harpy.kills,
+                    "inline": True
+                },
+                {
+                    "name": f"{profile.komodo.name} Kills",
+                    "value": profile.komodo.kills,
+                    "inline": True
+                },
+                {
+                    "name": f"{profile.hexfire.name} Kills",
+                    "value": profile.hexfire.kills,
+                    "inline": True
+                },
+                {
+                    "name": f"{profile.riot.name} Kills",
+                    "value": profile.riot.kills,
+                    "inline": True
+                },
+                {
+                    "name": f"{profile.salvo.name} Kills",
+                    "value": profile.salvo.kills,
+                    "inline": True
+                },
+                {
+                    "name": f"{profile.skybreaker.name} Kills",
+                    "value": profile.skybreaker.kills,
+                    "inline": True
+                },
+                {
+                    "name": f"{profile.protocol.name} Kills",
+                    "value": profile.protocol.kills,
+                    "inline": True
+                }
+            ]
+        elif name == "hacks":
+            fields = [
+                {
+                    "name": f"{profile.mine.name} Fusions",
+                    "value": profile.mine.fusions,
+                    "inline": True
+                },
+                {
+                    "name": f"{profile.slam.name} Fusions",
+                    "value": profile.slam.fusions,
+                    "inline": True
+                },
+                {
+                    "name": f"{profile.shockwave.name} Fusions",
+                    "value": profile.shockwave.fusions,
+                    "inline": True
+                },
+                {
+                    "name": f"{profile.wall.name} Fusions",
+                    "value": profile.wall.fusions,
+                    "inline": True
+                },
+                {
+                    "name": f"{profile.heal.name} Fusions",
+                    "value": profile.heal.fusions,
+                    "inline": True
+                },
+                {
+                    "name": f"{profile.teleport.name} Fusions",
+                    "value": profile.teleport.fusions,
+                    "inline": True
+                },
+                {
+                    "name": f"{profile.ball.name} Fusions",
+                    "value": profile.ball.fusions,
+                    "inline": True
+                },
+                {
+                    "name": f"{profile.invis.name} Fusions",
+                    "value": profile.invis.fusions,
+                    "inline": True
+                },
+                {
+                    "name": f"{profile.armor.name} Fusions",
+                    "value": profile.armor.fusions,
+                    "inline": True
+                },
+                {
+                    "name": f"{profile.magnet.name} Fusions",
+                    "value": profile.magnet.fusions,
+                    "inline": True
+                }
+            ]
 
         return fields
+
+    def get_weapon_stat_embed(self, name, profile):
+        """Function | Get Weapon Stat Embed
+
+        This function returns information on the stats a person has
+        for a specific chosen weapon
+
+        Args
+        ----------
+        name - The name of the weapon searched
+        profile - profile - An instance of the Profile class found in './Resources/APISession.py'
+        """
+        stat = getattr(profile, name)
+        embed = self.bot.embed_util.get_embed(
+            title = f"{stat.name} Stats",
+            thumbnail = profile.avatar_url,
+            author_url = profile.url,
+            fields = [
+                {
+                    "name": "Kills",
+                    "value": stat.kills,
+                    "inline": True
+                },
+                {
+                    "name": "Damage",
+                    "value": stat.damage,
+                    "inline": True
+                },
+                {
+                    "name": "Headshot Damage",
+                    "value": stat.headshot_damage,
+                    "inline": True
+                },
+                {
+                    "name": "Fusions",
+                    "value": stat.fusions,
+                    "inline": True
+                },
+                {
+                    "name": "Headshot Accuracy",
+                    "value": f"{stat.hs_accuracy}%",
+                    "inline": True
+                }
+            ]
+        )
+
+        return embed
+
+    def get_hack_stat_embed(self, name, profile):
+        """Function | Get Hack Stat Embed
+
+        This function returns information on the stats a person has
+        for a specific chosen hack
+
+        Args
+        ----------
+        name - The name of the hack searched
+        profile - profile - An instance of the Profile class found in './Resources/APISession.py'
+        """
+        stat = getattr(profile, name)
+        embed = self.bot.embed_util.get_embed(
+            title =f"{stat.name} Stats",
+            thumbnail = profile.avatar_url,
+            author_url = profile.url,
+            fields = [
+                {
+                    "name": "Kills",
+                    "value": stat.kills,
+                    "inline": True
+                },
+                {
+                    "name": "Damage",
+                    "value": stat.damage,
+                    "inline": True
+                },
+                {
+                    "name": "Fusions",
+                    "value": stat.fusions,
+                    "inline": True
+                }
+            ]
+        )
+
+        return embed
+
+    def update_leaderboards(self):
+        pass

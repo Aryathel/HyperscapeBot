@@ -17,7 +17,10 @@ class New(commands.Cog, name = "New"):
     """
     def __init__(self, bot):
         self.bot = bot
-        print("Loaded New Cog.")
+        print(f"{self.bot.OK} {self.bot.TIMELOG()} Loaded New Cog.")
+
+    def cog_unload():
+        print(f"{self.bot.OK} {self.bot.TIMELOG()} Unloaded New Cog.")
 
     @commands.guild_only()
     @commands.command(name = "SAMPLE", help = "Just a placeholder.", brief = "If parameters then examples here")

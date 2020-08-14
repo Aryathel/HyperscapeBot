@@ -5,7 +5,7 @@ Token Env Var: HyperBotDiscordToken
 Prefix: '!'
 
 # The channel ID of the channel taht the bot will send messages to.
-Log Channel: 601811847590576152
+Log Channel: 743719216993009737
 
 # The ID of the user you want to be pinged by the Broken command.
 Broken User ID: 246669108752416768
@@ -44,7 +44,7 @@ Embed Settings:
     Icon URL: https://i.ibb.co/5L2bmSv/Feature-Shards.jpg
 
 # The link for the server invite.
-Server Invite: https://discordapp.com/abcabc
+Server Invite: https://discord.com/invite/Q849V8v
 
 # The text for the online log message.
 # NOTE: Use '{username}' as a placeholder for the bot's username.
