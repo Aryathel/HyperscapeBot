@@ -1,0 +1,20 @@
+# Defining the placeholders that will be used throughout the rest of the permissions.
+# Must be defined in the format:
+# Name: ID
+# Name does not matter as long as it matches what is in the command permissions below.
+# ID must be a valid role ID.
+Roles:
+  Member: 000000000000
+  Admin: 000000000000
+
+# Permissions for each command. Command 'name' field is the key.
+# If you have grouped commands, delimit group commands with a '-':
+# example:
+#   - "{Member}"
+# example-command:
+#   - "{Member}"
+#   - "{Admin}"
+prefix:
+  - "{Admin}"
+restart:
+  - "{Admin}"
